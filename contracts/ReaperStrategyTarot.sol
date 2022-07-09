@@ -99,15 +99,15 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
     }
 
     function _adjustPosition(uint256 _debt) internal override {
-        // if (emergencyExit) {
-        //     return;
-        // }
+        if (emergencyExit) {
+            return;
+        }
 
-        // uint256 wantBalance = balanceOfWant();
-        // if (wantBalance > _debt) {
-        //     uint256 toReinvest = wantBalance - _debt;
-        //     _deposit(toReinvest);
-        // }
+        uint256 wantBalance = balanceOfWant();
+        if (wantBalance > _debt) {
+            uint256 toReinvest = wantBalance - _debt;
+            _deposit(toReinvest);
+        }
     }
 
     function _liquidatePosition(uint256 _amountNeeded)
@@ -175,26 +175,14 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
 
     /**
      * @dev Function that puts the funds to work.
-     * It gets called whenever someone deposits in the strategy's vault contract.
+     *      It gets called whenever someone deposits in the strategy's vault contract.
      */
-    function _deposit(uint256 toReinvest) internal {
-        // if (toReinvest != 0) {
-        //     address lendingPoolAddress = ADDRESSES_PROVIDER().getLendingPool();
-        //     IERC20Upgradeable(want).safeIncreaseAllowance(
-        //         lendingPoolAddress,
-        //         balanceOfWant()
-        //     );
-        //     LENDING_POOL().deposit(want, toReinvest, address(this), LENDER_REFERRAL_CODE_NONE);
-        // }
-
-        // (uint256 supply, uint256 borrow) = getSupplyAndBorrow();
-        // uint256 currentLtv = supply != 0 ? (borrow * PERCENT_DIVISOR) / supply : 0;
-
-        // if (currentLtv > maxLtv) {
-        //     _delever(0);
-        // } else if (currentLtv < targetLtv) {
-        //     _leverUpMax();
-        // }
+    function _deposit() internal override {
+        uint256 wantBalance = balanceOfWant();
+        if (wantBalance != 0) {
+            IERC20Upgradeable(want).safeTransfer(depositPool, wantBalance);
+            IBorrowable(depositPool).mint(address(this));
+        }
     }
 
     /**
