@@ -43,4 +43,6 @@ interface IVault {
      * external dependency.
      */
     function revokeStrategy(address strategy) external;
+
+    function getPricePerFullShare() external view returns (uint256);
 }
