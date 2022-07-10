@@ -10,6 +10,11 @@
       "address": "0x8198f5d8F8CfFE8f9C413d98a0A55aEB8ab9FbB7",
       "txHash": "0xec0809dec70e366adc23398a7f59b5467ef56a5393f7d215d44acfe378c5fb82",
       "kind": "uups"
+    },
+    {
+      "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      "txHash": "0x7b371b0d8c6eacde3c3622c7c7bb3fad226f7102123f8e7d1123652dd4bdc750",
+      "kind": "uups"
     }
   ],
   "impls": {
@@ -922,9 +927,9 @@
         }
       }
     },
-    "fa7f531f371a1851cad60f90a8ff2c14f5417a155128313de8df7a10d3da39d8": {
-      "address": "0x36b58F5C1969B7b6591D752ea6F5486D069010AB",
-      "txHash": "0x02e82e3b8c4a0b844b1047dfda9d8110c4dbdd08109d71859f44e0595ea7f3ea",
+    "3b9e5949d2a1094303a451e2e71277f78edfff294b9d24ef455f802a8fdcd69e": {
+      "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      "txHash": "0x218a27b4eeed78f00302b45d5c6026f29840721f88c6a94798bfbf9c4e565c53",
       "layout": {
         "storage": [
           {
@@ -1105,102 +1110,82 @@
             "src": "contracts\\abstract\\ReaperBaseStrategyv4.sol:78"
           },
           {
-            "label": "gWant",
+            "label": "usedPools",
             "offset": 0,
             "slot": "312",
-            "type": "t_contract(IAToken)11771",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:33"
+            "type": "t_struct(AddressSet)3096_storage",
+            "contract": "ReaperStrategyTarot",
+            "src": "contracts\\ReaperStrategyTarot.sol:51"
           },
           {
-            "label": "targetLtv",
-            "offset": 0,
-            "slot": "313",
-            "type": "t_uint256",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:35"
-          },
-          {
-            "label": "maxDeleverageLoopIterations",
+            "label": "maxPools",
             "offset": 0,
             "slot": "314",
             "type": "t_uint256",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:36"
+            "contract": "ReaperStrategyTarot",
+            "src": "contracts\\ReaperStrategyTarot.sol:52"
           },
           {
-            "label": "flashLoanStatus",
+            "label": "depositPool",
             "offset": 0,
             "slot": "315",
-            "type": "t_uint256",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:42"
+            "type": "t_address",
+            "contract": "ReaperStrategyTarot",
+            "src": "contracts\\ReaperStrategyTarot.sol:53"
           },
           {
-            "label": "rewardClaimingTokens",
+            "label": "sharePriceSnapshot",
             "offset": 0,
             "slot": "316",
-            "type": "t_array(t_address)dyn_storage",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:63"
+            "type": "t_uint256",
+            "contract": "ReaperStrategyTarot",
+            "src": "contracts\\ReaperStrategyTarot.sol:54"
           },
           {
-            "label": "wftmToWantPath",
+            "label": "minProfitToChargeFees",
             "offset": 0,
             "slot": "317",
-            "type": "t_array(t_address)dyn_storage",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:71"
+            "type": "t_uint256",
+            "contract": "ReaperStrategyTarot",
+            "src": "contracts\\ReaperStrategyTarot.sol:55"
           },
           {
-            "label": "geistToWftmPath",
+            "label": "minWantToDepositOrWithdraw",
             "offset": 0,
             "slot": "318",
-            "type": "t_array(t_address)dyn_storage",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:72"
+            "type": "t_uint256",
+            "contract": "ReaperStrategyTarot",
+            "src": "contracts\\ReaperStrategyTarot.sol:56"
           },
           {
-            "label": "wftmToDaiPath",
+            "label": "maxWantRemainingToRemovePool",
             "offset": 0,
             "slot": "319",
-            "type": "t_array(t_address)dyn_storage",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:73"
+            "type": "t_uint256",
+            "contract": "ReaperStrategyTarot",
+            "src": "contracts\\ReaperStrategyTarot.sol:57"
           },
           {
-            "label": "maxLtv",
+            "label": "shouldHarvestOnDeposit",
             "offset": 0,
             "slot": "320",
-            "type": "t_uint256",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:75"
+            "type": "t_bool",
+            "contract": "ReaperStrategyTarot",
+            "src": "contracts\\ReaperStrategyTarot.sol:58"
           },
           {
-            "label": "minLeverageAmount",
-            "offset": 0,
-            "slot": "321",
-            "type": "t_uint256",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:76"
-          },
-          {
-            "label": "minWftmToSell",
-            "offset": 0,
-            "slot": "322",
-            "type": "t_uint256",
-            "contract": "ReaperStrategyGeist",
-            "src": "contracts\\ReaperStrategyGeist.sol:78"
+            "label": "shouldHarvestOnWithdraw",
+            "offset": 1,
+            "slot": "320",
+            "type": "t_bool",
+            "contract": "ReaperStrategyTarot",
+            "src": "contracts\\ReaperStrategyTarot.sol:59"
           }
         ],
         "types": {
           "t_address": {
             "label": "address",
             "numberOfBytes": "20"
-          },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]",
-            "numberOfBytes": "32"
           },
           "t_array(t_bytes32)dyn_storage": {
             "label": "bytes32[]",
@@ -1221,10 +1206,6 @@
           "t_bytes32": {
             "label": "bytes32",
             "numberOfBytes": "32"
-          },
-          "t_contract(IAToken)11771": {
-            "label": "contract IAToken",
-            "numberOfBytes": "20"
           },
           "t_mapping(t_address,t_bool)": {
             "label": "mapping(address => bool)",
