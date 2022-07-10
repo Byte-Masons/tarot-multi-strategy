@@ -33,10 +33,15 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
 
     /**
      * @dev Tokens Used:
-     * {WFTM} - Required for liquidity routing when doing swaps.
-     * {want} - Address of the token being lent
+     * {DAI} - Token for charging fees
      */
-    address public constant WFTM = address(0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83);
+    address public constant DAI = address(0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1);
+
+    /**
+     * @dev UniV3 paths:
+     * {wantToDaiPath} - Path for charging fees from profit
+     */
+    bytes public wantToDaiPath;
 
     /**
      * @dev Tarot variables
@@ -69,19 +74,21 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         address[] memory _feeRemitters,
         address[] memory _strategists,
         address[] memory _multisigRoles,
-        uint256 _initialPoolIndex,
-        address _want
+        address[] memory _wantToDaiRoute,
+        uint24[] memory _wantToDaiFee,
+        uint256 _initialPoolIndex
     ) public initializer {
-        __ReaperBaseStrategy_init(_vault, _want, _feeRemitters, _strategists, _multisigRoles);
-       sharePriceSnapshot = IVault(_vault).getPricePerFullShare();
+        __ReaperBaseStrategy_init(_vault, _wantToDaiRoute[0], _feeRemitters, _strategists, _multisigRoles);
+        sharePriceSnapshot = IVault(_vault).getPricePerFullShare();
         maxPools = 40;
-        minProfitToChargeFees = 1e16;
+        minProfitToChargeFees = 1e14;
         minWantToDepositOrWithdraw = 10;
         maxWantRemainingToRemovePool = 100;
         addUsedPool(_initialPoolIndex);
         depositPool = usedPools.at(0); // Guarantees depositPool is always a Tarot pool
         shouldHarvestOnDeposit = true;
         shouldHarvestOnWithdraw = true;
+        wantToDaiPath = UniswapV3Utils.routeToPath(_wantToDaiRoute, _wantToDaiFee);
     }
 
     function _adjustPosition(uint256 _debt) internal override {
@@ -245,7 +252,6 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         uint256 profit = profitSinceHarvest();
         if (profit >= minProfitToChargeFees) {
             uint256 fee = (profit * totalFee) / PERCENT_DIVISOR;
-            IERC20Upgradeable wftm = IERC20Upgradeable(WFTM);
 
             if (fee != 0) {
                 uint256 wantBal = IERC20Upgradeable(want).balanceOf(address(this));
@@ -255,16 +261,18 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
                         fee = withdrawn + wantBal;
                     }
                 }
-                _swap(want, WFTM, fee);
-                uint256 wftmBalance = IERC20Upgradeable(WFTM).balanceOf(address(this));
-                callerFee = (wftmBalance * callFee) / PERCENT_DIVISOR;
-                uint256 treasuryFeeToVault = (wftmBalance * treasuryFee) / PERCENT_DIVISOR;
+                _swapToDai(fee);
+                IERC20Upgradeable dai = IERC20Upgradeable(DAI);
+                uint256 daiBalance = dai.balanceOf(address(this));
+                callerFee = (daiBalance * callFee) / PERCENT_DIVISOR;
+                uint256 treasuryFeeToVault = (daiBalance * treasuryFee) / PERCENT_DIVISOR;
                 uint256 feeToStrategist = (treasuryFeeToVault * strategistFee) / PERCENT_DIVISOR;
                 treasuryFeeToVault -= feeToStrategist;
 
-                wftm.safeTransfer(msg.sender, callerFee);
-                wftm.safeTransfer(treasury, treasuryFeeToVault);
-                wftm.safeTransfer(strategistRemitter, feeToStrategist);
+                
+                dai.safeTransfer(msg.sender, callerFee);
+                dai.safeTransfer(treasury, treasuryFeeToVault);
+                dai.safeTransfer(strategistRemitter, feeToStrategist);
                 sharePriceSnapshot = IVault(vault).getPricePerFullShare();
             }
         }
@@ -273,26 +281,14 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
     /**
      * @dev Helper function to swap tokens given {_from}, {_to} and {_amount}
      */
-    function _swap(
-        address _from,
-        address _to,
+    function _swapToDai(
         uint256 _amount
     ) internal {
-        if (_from == _to || _amount == 0) {
+        if (_amount == 0) {
             return;
         }
-
-        address[] memory path = new address[](2);
-        path[0] = _from;
-        path[1] = _to;
-        IERC20Upgradeable(_from).safeIncreaseAllowance(UNI_ROUTER, _amount);
-        // IUniswapV2Router02(UNI_ROUTER).swapExactTokensForTokensSupportingFeeOnTransferTokens(
-        //     _amount,
-        //     0,
-        //     path,
-        //     address(this),
-        //     block.timestamp
-        // );
+        IERC20Upgradeable(want).safeIncreaseAllowance(UNI_ROUTER, _amount);
+        UniswapV3Utils.swap(UNI_ROUTER, wantToDaiPath, _amount);
     }
 
     /**

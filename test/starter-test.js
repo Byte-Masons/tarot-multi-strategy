@@ -56,6 +56,8 @@ describe('Vaults', function () {
 
   const daiAddress = '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1';
   const wantAddress = '0x4200000000000000000000000000000000000006';
+  const wantToDaiPath = [wantAddress, daiAddress];
+  const wantToDaiFee = [3000];
 
   const wantHolderAddr = '0x428AB2BA90Eba0a4Be7aF34C9Ac451ab061AC010';
   const strategistAddr = '0x1A20D7A31e5B3Bc5f02c8A146EF6f394502a10c4';
@@ -142,8 +144,9 @@ describe('Vaults', function () {
         [treasuryAddr, paymentSplitterAddress],
         [strategistAddr],
         [superAdminAddress, adminAddress, guardianAddress],
+        wantToDaiPath,
+        wantToDaiFee,
         poolIndex,
-        wantAddress,
       ],
       {kind: 'uups'},
     );
@@ -258,7 +261,7 @@ describe('Vaults', function () {
     });
   });
 
-  xdescribe('Vault Tests', function () {
+  describe('Vault Tests', function () {
     it('should allow deposits and account for them correctly', async function () {
       const userBalance = await want.balanceOf(wantHolderAddr);
       const vaultBalance = await vault.totalAssets();
