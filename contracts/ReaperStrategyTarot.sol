@@ -6,13 +6,14 @@ import "./interfaces/IFactory.sol";
 import "./interfaces/IPoolToken.sol";
 import "./interfaces/ICollateral.sol";
 import "./interfaces/IBorrowable.sol";
-import "./interfaces/IUniswapV2Router02.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+import "./library/UniswapV3Utils.sol";
 
 pragma solidity 0.8.11;
+pragma experimental ABIEncoderV2;
 
 /**
  * @dev This strategy will deposit and leverage a token on Geist to maximize yield
@@ -27,7 +28,7 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
     }
 
     // 3rd-party contract addresses
-    address public constant SPOOKY_ROUTER = address(0xF491e7B69E4244ad4002BC14e878a34207E38c29);
+    address public constant UNI_ROUTER = address(0xE592427A0AEce92De3Edee1F18E0157C05861564);
     address public constant TAROT_ROUTER = address(0xD4a6a05081fD270dC111332845A778a49FE01741);
 
     /**
@@ -284,8 +285,8 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         address[] memory path = new address[](2);
         path[0] = _from;
         path[1] = _to;
-        IERC20Upgradeable(_from).safeIncreaseAllowance(SPOOKY_ROUTER, _amount);
-        IUniswapV2Router02(SPOOKY_ROUTER).swapExactTokensForTokensSupportingFeeOnTransferTokens(
+        IERC20Upgradeable(_from).safeIncreaseAllowance(UNI_ROUTER, _amount);
+        IUniswapV2Router02(UNI_ROUTER).swapExactTokensForTokensSupportingFeeOnTransferTokens(
             _amount,
             0,
             path,
