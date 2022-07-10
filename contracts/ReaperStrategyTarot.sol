@@ -286,13 +286,13 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         path[0] = _from;
         path[1] = _to;
         IERC20Upgradeable(_from).safeIncreaseAllowance(UNI_ROUTER, _amount);
-        IUniswapV2Router02(UNI_ROUTER).swapExactTokensForTokensSupportingFeeOnTransferTokens(
-            _amount,
-            0,
-            path,
-            address(this),
-            block.timestamp
-        );
+        // IUniswapV2Router02(UNI_ROUTER).swapExactTokensForTokensSupportingFeeOnTransferTokens(
+        //     _amount,
+        //     0,
+        //     path,
+        //     address(this),
+        //     block.timestamp
+        // );
     }
 
     /**
