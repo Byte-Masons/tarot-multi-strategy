@@ -13,7 +13,7 @@
     },
     {
       "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
-      "txHash": "0x33c7e6f75609eeb0038470ca7325cff1177aaa78f0c790249f1ce34acb5f653c",
+      "txHash": "0x865a93f841d6c73187ddd877834c2c70d4282a05b7e970227c02c085a6ac4b25",
       "kind": "uups"
     }
   ],
@@ -927,9 +927,9 @@
         }
       }
     },
-    "64c9317176caa395b33386753ee6c32f44d1d5c4dddb99d9b853ea2ddbe07c0d": {
+    "d589917e3a1c0e8f02bc1bda753219a3899683e50e7d2a7eb6cea546e952206a": {
       "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
-      "txHash": "0x629e9e6157c8cba5605a958c529522777051ad10b87595b2c15b5b5cff9b0e52",
+      "txHash": "0x7234df4f543caa7d96e4cf6ed42869291cb235b5752e47870b2d5cc87646179b",
       "layout": {
         "storage": [
           {
@@ -1110,12 +1110,12 @@
             "src": "contracts\\abstract\\ReaperBaseStrategyv4.sol:78"
           },
           {
-            "label": "wantToDaiPath",
+            "label": "wantToUsdcRoute",
             "offset": 0,
             "slot": "312",
             "type": "t_bytes_storage",
             "contract": "ReaperStrategyTarot",
-            "src": "contracts\\ReaperStrategyTarot.sol:46"
+            "src": "contracts\\ReaperStrategyTarot.sol:44"
           },
           {
             "label": "usedPools",
@@ -1123,7 +1123,7 @@
             "slot": "313",
             "type": "t_struct(AddressSet)3096_storage",
             "contract": "ReaperStrategyTarot",
-            "src": "contracts\\ReaperStrategyTarot.sol:59"
+            "src": "contracts\\ReaperStrategyTarot.sol:57"
           },
           {
             "label": "maxPools",
@@ -1131,7 +1131,7 @@
             "slot": "315",
             "type": "t_uint256",
             "contract": "ReaperStrategyTarot",
-            "src": "contracts\\ReaperStrategyTarot.sol:60"
+            "src": "contracts\\ReaperStrategyTarot.sol:58"
           },
           {
             "label": "depositPool",
@@ -1139,7 +1139,7 @@
             "slot": "316",
             "type": "t_address",
             "contract": "ReaperStrategyTarot",
-            "src": "contracts\\ReaperStrategyTarot.sol:61"
+            "src": "contracts\\ReaperStrategyTarot.sol:59"
           },
           {
             "label": "sharePriceSnapshot",
@@ -1147,7 +1147,7 @@
             "slot": "317",
             "type": "t_uint256",
             "contract": "ReaperStrategyTarot",
-            "src": "contracts\\ReaperStrategyTarot.sol:62"
+            "src": "contracts\\ReaperStrategyTarot.sol:60"
           },
           {
             "label": "minProfitToChargeFees",
@@ -1155,7 +1155,7 @@
             "slot": "318",
             "type": "t_uint256",
             "contract": "ReaperStrategyTarot",
-            "src": "contracts\\ReaperStrategyTarot.sol:63"
+            "src": "contracts\\ReaperStrategyTarot.sol:61"
           },
           {
             "label": "minWantToDepositOrWithdraw",
@@ -1163,7 +1163,7 @@
             "slot": "319",
             "type": "t_uint256",
             "contract": "ReaperStrategyTarot",
-            "src": "contracts\\ReaperStrategyTarot.sol:64"
+            "src": "contracts\\ReaperStrategyTarot.sol:62"
           },
           {
             "label": "maxWantRemainingToRemovePool",
@@ -1171,7 +1171,7 @@
             "slot": "320",
             "type": "t_uint256",
             "contract": "ReaperStrategyTarot",
-            "src": "contracts\\ReaperStrategyTarot.sol:65"
+            "src": "contracts\\ReaperStrategyTarot.sol:63"
           },
           {
             "label": "shouldHarvestOnDeposit",
@@ -1179,13 +1179,21 @@
             "slot": "321",
             "type": "t_bool",
             "contract": "ReaperStrategyTarot",
-            "src": "contracts\\ReaperStrategyTarot.sol:66"
+            "src": "contracts\\ReaperStrategyTarot.sol:64"
           },
           {
             "label": "shouldHarvestOnWithdraw",
             "offset": 1,
             "slot": "321",
             "type": "t_bool",
+            "contract": "ReaperStrategyTarot",
+            "src": "contracts\\ReaperStrategyTarot.sol:65"
+          },
+          {
+            "label": "minWantToSell",
+            "offset": 0,
+            "slot": "322",
+            "type": "t_uint256",
             "contract": "ReaperStrategyTarot",
             "src": "contracts\\ReaperStrategyTarot.sol:67"
           }
