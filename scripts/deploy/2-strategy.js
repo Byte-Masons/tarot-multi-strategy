@@ -1,7 +1,7 @@
 const hre = require('hardhat');
 
 async function main() {
-  const vaultAddress = '';
+  const vaultAddress = '0x17D099fc623bd06CFE4861d874704Af184773c75';
 
   const Strategy = await ethers.getContractFactory('ReaperStrategyTarot');
 
@@ -20,7 +20,8 @@ async function main() {
   const wantAddress = '0x4200000000000000000000000000000000000006';
   const wantToUsdcPath = [wantAddress, usdcAddress];
   const wantToUsdcFee = [500];
-  const poolIndex = 5;
+  const poolIndex = 2;
+  const routerType = 1;
 
   const strategy = await hre.upgrades.deployProxy(
     Strategy,
@@ -32,6 +33,7 @@ async function main() {
       wantToUsdcPath,
       wantToUsdcFee,
       poolIndex,
+      routerType,
     ],
     {kind: 'uups', timeout: 0},
   );
