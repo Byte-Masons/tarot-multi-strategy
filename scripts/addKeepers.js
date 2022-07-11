@@ -1,5 +1,5 @@
 async function main() {
-  const strategyAddress = '0xDd957FbBdB549B957A1Db92b88bBA5297D0BbE99';
+  const strategyAddress = '0x0C13a59a95da229562eF8Fa47C9B117b2F3C51Bb';
   const Strategy = await ethers.getContractFactory('ReaperStrategyTarot');
   const strategy = Strategy.attach(strategyAddress);
 
