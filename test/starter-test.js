@@ -23,14 +23,14 @@ const toWantUnit = (num) => {
 
 const rebalance = async (strategy) => {
   const poolAllocations = [
+    // {
+    //   poolAddress: '0x6CFcA68b32Bdb5B02039Ccd03784cdc96De7FB87', // ZipSwap ETH-OP
+    //   allocation: toWantUnit('50'),
+    // },
     {
-      poolAddress: '0x6CFcA68b32Bdb5B02039Ccd03784cdc96De7FB87',
+      poolAddress: '0xabCC0531d4Cf0B4d6A92f1e5668696033a96f6D2', // Velodrome ETH-USDC
       allocation: toWantUnit('50'),
     },
-    // {
-    //   poolAddress: '0x445F69a4A1E6A5F15980a560Bf9dEB444ee51AC1',
-    //   allocation: ethers.BigNumber.from('65391926615092011295'),
-    // },
   ];
   await strategy.rebalance(poolAllocations);
 };
@@ -62,7 +62,10 @@ describe('Vaults', function () {
   const wantHolderAddr = '0x428AB2BA90Eba0a4Be7aF34C9Ac451ab061AC010';
   const strategistAddr = '0x1A20D7A31e5B3Bc5f02c8A146EF6f394502a10c4';
 
-  const poolIndex = 5;
+  const poolIndex = 2;
+  const routerType = 1;
+  // index 2, type 1 is Velo ETH-USDC
+  // index 5, type 0 is ZipSwap ETH-OP
 
   let owner;
   let wantHolder;
@@ -147,6 +150,7 @@ describe('Vaults', function () {
         wantToUsdcPath,
         wantToUsdcFee,
         poolIndex,
+        routerType,
       ],
       {kind: 'uups'},
     );
@@ -159,7 +163,7 @@ describe('Vaults', function () {
     await want.connect(wantHolder).approve(vault.address, ethers.constants.MaxUint256);
   });
 
-  describe('Deploying the vault and strategy', function () {
+  xdescribe('Deploying the vault and strategy', function () {
     it('should initiate vault with a 0 balance', async function () {
       const assets = ethers.utils.parseEther('1');
       const totalBalance = await vault.totalAssets();
@@ -261,7 +265,7 @@ describe('Vaults', function () {
     });
   });
 
-  describe('Vault Tests', function () {
+  xdescribe('Vault Tests', function () {
     it('should allow deposits and account for them correctly', async function () {
       const userBalance = await want.balanceOf(wantHolderAddr);
       const vaultBalance = await vault.totalAssets();

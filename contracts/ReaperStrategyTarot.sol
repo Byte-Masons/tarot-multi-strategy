@@ -27,9 +27,20 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         uint256 allocation;
     }
 
+    struct RouterPool {
+        RouterType routerType;
+        uint256 index;
+    }
+
+    enum RouterType {
+        ZIPSWAP,
+        VELODROME
+    }
+
     // 3rd-party contract addresses
     address public constant UNI_ROUTER = address(0xE592427A0AEce92De3Edee1F18E0157C05861564);
-    address public constant TAROT_ROUTER = address(0xD4a6a05081fD270dC111332845A778a49FE01741);
+    address public constant TAROT_ROUTER_ZIPSWAP = address(0xD4a6a05081fD270dC111332845A778a49FE01741);
+    address public constant TAROT_ROUTER_VELODROME = address(0xa516b9c7378799799e6DfadBdABF45d5b584405f);
 
     /**
      * @dev Tokens Used:
@@ -77,7 +88,8 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         address[] memory _multisigRoles,
         address[] memory _wantToUsdcRoute,
         uint24[] memory _wantToDaiFee,
-        uint256 _initialPoolIndex
+        uint256 _initialPoolIndex,
+        RouterType _routerType
     ) public initializer {
         __ReaperBaseStrategy_init(_vault, _wantToUsdcRoute[0], _feeRemitters, _strategists, _multisigRoles);
         sharePriceSnapshot = IVault(_vault).getPricePerFullShare();
@@ -86,7 +98,7 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         minWantToDepositOrWithdraw = 10;
         maxWantRemainingToRemovePool = 100;
         minWantToSell = 12 * 1e8;
-        addUsedPool(_initialPoolIndex);
+        addUsedPool(_initialPoolIndex, _routerType);
         depositPool = usedPools.at(0); // Guarantees depositPool is always a Tarot pool
         shouldHarvestOnDeposit = true;
         shouldHarvestOnWithdraw = true;
@@ -431,22 +443,30 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
     /**
      * @dev Adds multiple pools at once
      */
-    function addUsedPools(uint256[] calldata _poolsToAdd) external {
+    function addUsedPools(RouterPool[] calldata _poolsToAdd) external {
         _atLeastRole(KEEPER);
         uint256 nrOfPools = _poolsToAdd.length;
         for (uint256 index = 0; index < nrOfPools; index++) {
-            uint256 pool = _poolsToAdd[index];
-            addUsedPool(pool);
+            RouterPool memory pool = _poolsToAdd[index];
+            addUsedPool(pool.index, pool.routerType);
         }
     }
 
     /**
      * @dev Adds a new pool using the Tarot factory index (to ensure only Tarot pools can be added)
      */
-    function addUsedPool(uint256 _poolIndex) public {
+    function addUsedPool(uint256 _poolIndex, RouterType _routerType) public {
         _atLeastRole(KEEPER);
 
-        address factory = IRouter(TAROT_ROUTER).factory();
+        address router;
+
+        if (_routerType == RouterType.ZIPSWAP) {
+            router = TAROT_ROUTER_ZIPSWAP;
+        } else if (_routerType == RouterType.VELODROME) {
+            router = TAROT_ROUTER_VELODROME;
+        }
+
+        address factory = IRouter(router).factory();
         address lpAddress = IFactory(factory).allLendingPools(_poolIndex);
         address lp0 = IUniswapV2Pair(lpAddress).token0();
         address lp1 = IUniswapV2Pair(lpAddress).token1();
