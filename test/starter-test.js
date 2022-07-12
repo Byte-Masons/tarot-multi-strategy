@@ -28,7 +28,7 @@ const rebalance = async (strategy) => {
     //   allocation: toWantUnit('50'),
     // },
     {
-      poolAddress: '0xabCC0531d4Cf0B4d6A92f1e5668696033a96f6D2', // Velodrome ETH-USDC
+      poolAddress: '0x0af2Fdfde652310677ddf3b0bb6cD903476C4342', // Velodrome OP-USDC
       allocation: toWantUnit('50'),
     },
   ];
@@ -55,14 +55,14 @@ describe('Vaults', function () {
   const maintainerAddress = '0x81876677843D00a7D792E1617459aC2E93202576';
 
   const usdcAddress = '0x7F5c764cBc14f9669B88837ca1490cCa17c31607';
-  const wantAddress = '0x4200000000000000000000000000000000000006';
+  const wantAddress = '0x4200000000000000000000000000000000000042';
   const wantToUsdcPath = [wantAddress, usdcAddress];
-  const wantToUsdcFee = [500];
+  const wantToUsdcFee = [3000];
 
-  const wantHolderAddr = '0x428AB2BA90Eba0a4Be7aF34C9Ac451ab061AC010';
+  const wantHolderAddr = '0xebe80f029b1c02862b9e8a70a7e5317c06f62cae';
   const strategistAddr = '0x1A20D7A31e5B3Bc5f02c8A146EF6f394502a10c4';
 
-  const poolIndex = 2;
+  const poolIndex = 3;
   const routerType = 1;
   // index 2, type 1 is Velo ETH-USDC
   // index 5, type 0 is ZipSwap ETH-OP
@@ -699,7 +699,7 @@ describe('Vaults', function () {
     });
   });
 
-  describe('Strategy', function () {
+  xdescribe('Strategy', function () {
     it('should provide yield', async function () {
       const timeToSkip = 3600;
       const initialUserBalance = await want.balanceOf(wantHolderAddr);
@@ -740,7 +740,7 @@ describe('Vaults', function () {
   });
 
   xdescribe('Vault<>Strat accounting', function () {
-    xit('Strat gets more money when it flows in', async function () {
+    it('Strat gets more money when it flows in', async function () {
       await vault.connect(wantHolder).deposit(toWantUnit('500'), wantHolderAddr);
       await strategy.harvest();
 
@@ -771,7 +771,7 @@ describe('Vaults', function () {
       expect(isSmallBalanceDifference).to.equal(true);
     });
 
-    xit('Vault pulls funds from strat as needed', async function () {
+    it('Vault pulls funds from strat as needed', async function () {
       await vault.connect(wantHolder).deposit(toWantUnit('1000'), wantHolderAddr);
       await strategy.harvest();
       await moveTimeForward(3600);
@@ -807,7 +807,7 @@ describe('Vaults', function () {
     });
   });
 
-  xdescribe('Emergency scenarios', function () {
+  describe('Emergency scenarios', function () {
     it('Vault should handle emergency shutdown', async function () {
       await vault.connect(wantHolder).deposit(toWantUnit('1000'), wantHolderAddr);
       await strategy.harvest();
