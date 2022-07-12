@@ -1,10 +1,10 @@
 async function main() {
   const Vault = await ethers.getContractFactory('ReaperVaultV2');
 
-  const wantAddress = '0x4200000000000000000000000000000000000006';
-  const tokenName = 'ETH Crypt';
-  const tokenSymbol = 'rfETH';
-  const tvlCap = ethers.utils.parseEther('1');
+  const wantAddress = '0x7F5c764cBc14f9669B88837ca1490cCa17c31607';
+  const tokenName = 'USDC Crypt';
+  const tokenSymbol = 'rfUSDC';
+  const tvlCap = ethers.BigNumber.from(1000000000);
 
   const strategist1 = '0x1E71AEE6081f62053123140aacC7a06021D77348';
   const strategist2 = '0x81876677843D00a7D792E1617459aC2E93202576';

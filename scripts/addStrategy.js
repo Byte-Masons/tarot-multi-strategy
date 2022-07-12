@@ -1,9 +1,9 @@
 async function main() {
-  const vaultAddress = '0x17D099fc623bd06CFE4861d874704Af184773c75';
+  const vaultAddress = '0x9B7bd49E37195Ea029BdDCBEF14e4eB2349DDe0E';
   const Vault = await ethers.getContractFactory('ReaperVaultV2');
   const vault = Vault.attach(vaultAddress);
 
-  const strategyAddress = '0xDd957FbBdB549B957A1Db92b88bBA5297D0BbE99';
+  const strategyAddress = '0xA26FFf7821FEd25eb37AF785c04c743649cE6EDb';
   const strategyAllocation = 9990;
   await vault.addStrategy(strategyAddress, strategyAllocation);
   console.log('Strategy added!');

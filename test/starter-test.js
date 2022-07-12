@@ -18,17 +18,14 @@ const moveBlocksForward = async (blocks) => {
 };
 
 const toWantUnit = (num) => {
-  return ethers.utils.parseEther(num);
+  let decimals = 6;
+  return ethers.BigNumber.from(num * 10 ** decimals);
 };
 
 const rebalance = async (strategy) => {
   const poolAllocations = [
-    // {
-    //   poolAddress: '0x6CFcA68b32Bdb5B02039Ccd03784cdc96De7FB87', // ZipSwap ETH-OP
-    //   allocation: toWantUnit('50'),
-    // },
     {
-      poolAddress: '0xabCC0531d4Cf0B4d6A92f1e5668696033a96f6D2', // Velodrome ETH-USDC
+      poolAddress: '0xeBe70Ea3ff5fe44A22185870F46A9d092958Db69', // Velodrome ETH-USDC
       allocation: toWantUnit('50'),
     },
   ];
@@ -54,12 +51,9 @@ describe('Vaults', function () {
   const guardianAddress = '0xf20E25f2AB644C8ecBFc992a6829478a85A98F2c';
   const maintainerAddress = '0x81876677843D00a7D792E1617459aC2E93202576';
 
-  const usdcAddress = '0x7F5c764cBc14f9669B88837ca1490cCa17c31607';
-  const wantAddress = '0x4200000000000000000000000000000000000006';
-  const wantToUsdcPath = [wantAddress, usdcAddress];
-  const wantToUsdcFee = [500];
+  const wantAddress = '0x7F5c764cBc14f9669B88837ca1490cCa17c31607';
 
-  const wantHolderAddr = '0x428AB2BA90Eba0a4Be7aF34C9Ac451ab061AC010';
+  const wantHolderAddr = '0xa3f45e619ce3aae2fa5f8244439a66b203b78bcc';
   const strategistAddr = '0x1A20D7A31e5B3Bc5f02c8A146EF6f394502a10c4';
 
   const poolIndex = 2;
@@ -147,8 +141,7 @@ describe('Vaults', function () {
         [treasuryAddr, paymentSplitterAddress],
         [strategistAddr],
         [superAdminAddress, adminAddress, guardianAddress],
-        wantToUsdcPath,
-        wantToUsdcFee,
+        wantAddress,
         poolIndex,
         routerType,
       ],
@@ -157,7 +150,6 @@ describe('Vaults', function () {
     await strategy.deployed();
     await vault.addStrategy(strategy.address, 9000);
     want = await Want.attach(wantAddress);
-    usdc = await Want.attach(usdcAddress);
 
     //approving LP token and vault share spend
     await want.connect(wantHolder).approve(vault.address, ethers.constants.MaxUint256);
@@ -265,7 +257,7 @@ describe('Vaults', function () {
     });
   });
 
-  xdescribe('Vault Tests', function () {
+  describe('Vault Tests', function () {
     it('should allow deposits and account for them correctly', async function () {
       const userBalance = await want.balanceOf(wantHolderAddr);
       const vaultBalance = await vault.totalAssets();
@@ -699,7 +691,7 @@ describe('Vaults', function () {
     });
   });
 
-  describe('Strategy', function () {
+  xdescribe('Strategy', function () {
     it('should provide yield', async function () {
       const timeToSkip = 3600;
       const initialUserBalance = await want.balanceOf(wantHolderAddr);

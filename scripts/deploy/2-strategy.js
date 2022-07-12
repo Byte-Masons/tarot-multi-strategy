@@ -1,7 +1,7 @@
 const hre = require('hardhat');
 
 async function main() {
-  const vaultAddress = '0x17D099fc623bd06CFE4861d874704Af184773c75';
+  const vaultAddress = '0x9B7bd49E37195Ea029BdDCBEF14e4eB2349DDe0E';
 
   const Strategy = await ethers.getContractFactory('ReaperStrategyTarot');
 
@@ -16,10 +16,7 @@ async function main() {
   const admin = '0xeb9C9b785aA7818B2EBC8f9842926c4B9f707e4B';
   const guardian = '0xb0C9D5851deF8A2Aac4A23031CA2610f8C3483F9';
 
-  const usdcAddress = '0x7F5c764cBc14f9669B88837ca1490cCa17c31607';
-  const wantAddress = '0x4200000000000000000000000000000000000006';
-  const wantToUsdcPath = [wantAddress, usdcAddress];
-  const wantToUsdcFee = [500];
+  const wantAddress = '0x7F5c764cBc14f9669B88837ca1490cCa17c31607';
   const poolIndex = 2;
   const routerType = 1;
 
@@ -30,8 +27,7 @@ async function main() {
       [treasuryAddress, paymentSplitterAddress],
       [strategist1, strategist2, strategist3],
       [superAdmin, admin, guardian],
-      wantToUsdcPath,
-      wantToUsdcFee,
+      wantAddress,
       poolIndex,
       routerType,
     ],
