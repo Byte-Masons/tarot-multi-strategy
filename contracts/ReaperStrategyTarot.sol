@@ -45,7 +45,7 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
      * @dev Tokens Used:
      * {USDC} - Token for charging fees
      */
-    address public constant USDC = address(0x04068da6c83afcfa0e13ba15a6696662335d5b75);
+    address public constant USDC = address(0x04068DA6C83AFCFA0e13ba15A6696662335D5B75);
 
     /**
      * @dev UniV2 routes:
@@ -301,7 +301,7 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
             IUniswapV2Router02(SPOOKY_ROUTER).swapExactTokensForTokensSupportingFeeOnTransferTokens(
                 _amount,
                 0,
-                wantToUsdcRoute,
+                wantToUsdcPath,
                 address(this),
                 block.timestamp
             );
@@ -464,10 +464,10 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
 
         address router;
 
-        if (_routerType == RouterType.ZIPSWAP) {
-            router = TAROT_ROUTER_ZIPSWAP;
-        } else if (_routerType == RouterType.VELODROME) {
-            router = TAROT_ROUTER_VELODROME;
+        if (_routerType == RouterType.CLASSIC) {
+            router = TAROT_ROUTER;
+        } else if (_routerType == RouterType.REQUIEM) {
+            router = TAROT_REQUIEM_ROUTER;
         }
 
         address factory = IRouter(router).factory();
