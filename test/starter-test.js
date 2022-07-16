@@ -54,18 +54,15 @@ describe('Vaults', function () {
   const guardianAddress = '0xf20E25f2AB644C8ecBFc992a6829478a85A98F2c';
   const maintainerAddress = '0x81876677843D00a7D792E1617459aC2E93202576';
 
-  const usdcAddress = '0x7F5c764cBc14f9669B88837ca1490cCa17c31607';
-  const wantAddress = '0x4200000000000000000000000000000000000006';
+  const usdcAddress = '0x04068da6c83afcfa0e13ba15a6696662335d5b75';
+  const wantAddress = '0x049d68029688eAbF473097a2fC38ef61633A3C7A';
   const wantToUsdcPath = [wantAddress, usdcAddress];
-  const wantToUsdcFee = [500];
 
   const wantHolderAddr = '0x428AB2BA90Eba0a4Be7aF34C9Ac451ab061AC010';
   const strategistAddr = '0x1A20D7A31e5B3Bc5f02c8A146EF6f394502a10c4';
 
-  const poolIndex = 2;
+  const poolIndex = 27;
   const routerType = 1;
-  // index 2, type 1 is Velo ETH-USDC
-  // index 5, type 0 is ZipSwap ETH-OP
 
   let owner;
   let wantHolder;

@@ -6,14 +6,13 @@ import "./interfaces/IFactory.sol";
 import "./interfaces/IPoolToken.sol";
 import "./interfaces/ICollateral.sol";
 import "./interfaces/IBorrowable.sol";
+import "./interfaces/IUniswapV2Router02.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
-import "./library/UniswapV3Utils.sol";
 
 pragma solidity 0.8.11;
-pragma experimental ABIEncoderV2;
 
 /**
  * @dev This strategy will deposit and leverage a token on Geist to maximize yield
@@ -33,26 +32,26 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
     }
 
     enum RouterType {
-        ZIPSWAP,
-        VELODROME
+        CLASSIC,
+        REQUIEM
     }
 
     // 3rd-party contract addresses
-    address public constant UNI_ROUTER = address(0xE592427A0AEce92De3Edee1F18E0157C05861564);
-    address public constant TAROT_ROUTER_ZIPSWAP = address(0xD4a6a05081fD270dC111332845A778a49FE01741);
-    address public constant TAROT_ROUTER_VELODROME = address(0xa516b9c7378799799e6DfadBdABF45d5b584405f);
+    address public constant SPOOKY_ROUTER = address(0xF491e7B69E4244ad4002BC14e878a34207E38c29);
+    address public constant TAROT_ROUTER = address(0x283e62CFe14b352dB8e30A9575481DCbf589Ad98);
+    address public constant TAROT_REQUIEM_ROUTER = address(0x3F7E61C5dd29F9380b270551e438B65c29183a7c);
 
     /**
      * @dev Tokens Used:
      * {USDC} - Token for charging fees
      */
-    address public constant USDC = address(0x7F5c764cBc14f9669B88837ca1490cCa17c31607);
+    address public constant USDC = address(0x04068da6c83afcfa0e13ba15a6696662335d5b75);
 
     /**
-     * @dev UniV3 routes:
-     * {wantToUsdcRoute} - Route for charging fees from profit
+     * @dev UniV2 routes:
+     * {wantToUsdcPath} - Path for charging fees from profit
      */
-    bytes public wantToUsdcRoute;
+    address[] public wantToUsdcPath;
 
     /**
      * @dev Tarot variables
@@ -86,23 +85,22 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         address[] memory _feeRemitters,
         address[] memory _strategists,
         address[] memory _multisigRoles,
-        address[] memory _wantToUsdcRoute,
-        uint24[] memory _wantToDaiFee,
+        address[] memory _wantToUsdcPath,
         uint256 _initialPoolIndex,
         RouterType _routerType
     ) public initializer {
-        __ReaperBaseStrategy_init(_vault, _wantToUsdcRoute[0], _feeRemitters, _strategists, _multisigRoles);
+        __ReaperBaseStrategy_init(_vault, _wantToUsdcPath[0], _feeRemitters, _strategists, _multisigRoles);
         sharePriceSnapshot = IVault(_vault).getPricePerFullShare();
         maxPools = 40;
         minProfitToChargeFees = 1e9;
         minWantToDepositOrWithdraw = 10;
         maxWantRemainingToRemovePool = 100;
-        minWantToSell = 12 * 1e8;
+        minWantToSell = 1e2;
         addUsedPool(_initialPoolIndex, _routerType);
         depositPool = usedPools.at(0); // Guarantees depositPool is always a Tarot pool
         shouldHarvestOnDeposit = true;
         shouldHarvestOnWithdraw = true;
-        wantToUsdcRoute = UniswapV3Utils.routeToPath(_wantToUsdcRoute, _wantToDaiFee);
+        wantToUsdcPath = _wantToUsdcPath;
     }
 
     function _adjustPosition(uint256 _debt) internal override {
@@ -299,8 +297,14 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         uint256 _amount
     ) internal {
         if (_amount >= minWantToSell) {
-            IERC20Upgradeable(want).safeIncreaseAllowance(UNI_ROUTER, _amount);
-            UniswapV3Utils.swap(UNI_ROUTER, wantToUsdcRoute, _amount);
+            IERC20Upgradeable(want).safeIncreaseAllowance(SPOOKY_ROUTER, _amount);
+            IUniswapV2Router02(SPOOKY_ROUTER).swapExactTokensForTokensSupportingFeeOnTransferTokens(
+                _amount,
+                0,
+                wantToUsdcRoute,
+                address(this),
+                block.timestamp
+            );
         }
     }
 
