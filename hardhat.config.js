@@ -41,8 +41,8 @@ module.exports = {
   },
   networks: {
     mainnet: {
-      url: `https://mainnet.optimism.io`,
-      chainId: 10,
+      url: `https://rpc.ftm.tools`,
+      chainId: 250,
       accounts: [`0x${PRIVATE_KEY}`],
     },
   },
