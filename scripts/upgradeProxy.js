@@ -1,6 +1,6 @@
 async function main() {
   const stratFactory = await ethers.getContractFactory('ReaperStrategyTarot');
-  await hre.upgrades.upgradeProxy('', stratFactory, {
+  await hre.upgrades.upgradeProxy('0x7f438CFB14F6089C617c79D516Dea73052eb5c29', stratFactory, {
     timeout: 0,
   });
   console.log('Strategy upgraded!');
