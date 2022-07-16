@@ -62,7 +62,6 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
      * {minProfitToChargeFees} - The minimum amount of profit for harvest to charge fees
      * {minWantToDepositOrWithdraw} - A minimum amount to deposit or withdraw from a pool (to save gas on very small amounts)
      * {maxWantRemainingToRemovePool} - Sets the allowed amount for a pool to have and still be removable (which will loose those funds)
-     * {MAX_SLIPPAGE_TOLERANCE} - Sets a cap on the withdraw slippage tolerance 
      */
     EnumerableSetUpgradeable.AddressSet private usedPools;
     uint256 public maxPools;
@@ -71,9 +70,6 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
     uint256 public minProfitToChargeFees;
     uint256 public minWantToDepositOrWithdraw;
     uint256 public maxWantRemainingToRemovePool;
-    bool public shouldHarvestOnDeposit;
-    bool public shouldHarvestOnWithdraw;
-    uint256 public constant MAX_SLIPPAGE_TOLERANCE = 100;
     uint256 public minWantToSell;
 
     /**
@@ -98,8 +94,6 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         minWantToSell = 1e2;
         addUsedPool(_initialPoolIndex, _routerType);
         depositPool = usedPools.at(0); // Guarantees depositPool is always a Tarot pool
-        shouldHarvestOnDeposit = true;
-        shouldHarvestOnWithdraw = true;
         wantToUsdcPath = _wantToUsdcPath;
     }
 
@@ -559,22 +553,6 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
     function setMaxPools(uint256 _maxPools) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(_maxPools != 0 && _maxPools <= 100, "Invalid nr of pools");
         maxPools = _maxPools;
-    }
-
-    /**
-     * @dev Sets if harvests should be done when depositing
-     */
-    function setShouldHarvestOnDeposit(bool _shouldHarvestOnDeposit) external {
-        _atLeastRole(STRATEGIST);
-        shouldHarvestOnDeposit = _shouldHarvestOnDeposit;
-    }
-
-    /**
-     * @dev Sets if harvests should be done when withdrawing
-     */
-    function setShouldHarvestOnWithdraw(bool _shouldHarvestOnWithdraw) external {
-        _atLeastRole(STRATEGIST);
-        shouldHarvestOnWithdraw = _shouldHarvestOnWithdraw;
     }
 
     /**
