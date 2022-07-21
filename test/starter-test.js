@@ -44,7 +44,7 @@ describe('Vaults', function () {
 
   let Want;
   let want;
-  let dai;
+  let usdc;
 
   const treasuryAddr = '0x1E71AEE6081f62053123140aacC7a06021D77348';
   const paymentSplitterAddress = '0x1E71AEE6081f62053123140aacC7a06021D77348';
@@ -54,8 +54,10 @@ describe('Vaults', function () {
   const guardianAddress = '0xf20E25f2AB644C8ecBFc992a6829478a85A98F2c';
   const maintainerAddress = '0x81876677843D00a7D792E1617459aC2E93202576';
 
-  const daiAddress = '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1';
+  const usdcAddress = '0x7F5c764cBc14f9669B88837ca1490cCa17c31607';
   const wantAddress = '0x4200000000000000000000000000000000000006';
+  const wantToUsdcPath = [wantAddress, usdcAddress];
+  const wantToUsdcFee = [500];
 
   const wantHolderAddr = '0x428AB2BA90Eba0a4Be7aF34C9Ac451ab061AC010';
   const strategistAddr = '0x1A20D7A31e5B3Bc5f02c8A146EF6f394502a10c4';
@@ -142,15 +144,16 @@ describe('Vaults', function () {
         [treasuryAddr, paymentSplitterAddress],
         [strategistAddr],
         [superAdminAddress, adminAddress, guardianAddress],
+        wantToUsdcPath,
+        wantToUsdcFee,
         poolIndex,
-        wantAddress,
       ],
       {kind: 'uups'},
     );
     await strategy.deployed();
     await vault.addStrategy(strategy.address, 9000);
     want = await Want.attach(wantAddress);
-    dai = await Want.attach(daiAddress);
+    usdc = await Want.attach(usdcAddress);
 
     //approving LP token and vault share spend
     await want.connect(wantHolder).approve(vault.address, ethers.constants.MaxUint256);
@@ -258,7 +261,7 @@ describe('Vaults', function () {
     });
   });
 
-  xdescribe('Vault Tests', function () {
+  describe('Vault Tests', function () {
     it('should allow deposits and account for them correctly', async function () {
       const userBalance = await want.balanceOf(wantHolderAddr);
       const vaultBalance = await vault.totalAssets();
@@ -724,9 +727,9 @@ describe('Vaults', function () {
       const predictedCallerFee = await readOnlyStrat.callStatic.harvest();
       console.log(`predicted caller fee ${ethers.utils.formatEther(predictedCallerFee)}`);
 
-      const daiBalBefore = await dai.balanceOf(owner.address);
+      const daiBalBefore = await usdc.balanceOf(owner.address);
       await strategy.harvest();
-      const daiBalAfter = await dai.balanceOf(owner.address);
+      const daiBalAfter = await usdc.balanceOf(owner.address);
       const daiBalDifference = daiBalAfter.sub(daiBalBefore);
       console.log(`actual caller fee ${ethers.utils.formatEther(daiBalDifference)}`);
     });

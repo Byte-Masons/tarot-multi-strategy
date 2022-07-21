@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
-import "@uniswap/v3-periphery/contracts/libraries/Path.sol";
-import "../interfaces/IUniswapRouterV3.sol";
+import '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
+// import "@uniswap/v3-periphery/contracts/libraries/Path.sol";
 
 library UniswapV3Utils {
-    using Path for bytes;
+    // using Path for bytes;
 
     // Swap along an encoded path using known amountIn
     function swap(
@@ -14,14 +14,14 @@ library UniswapV3Utils {
         bytes memory _path,
         uint256 _amountIn
     ) internal returns (uint256 amountOut) {
-        IUniswapRouterV3.ExactInputParams memory params = IUniswapRouterV3.ExactInputParams({
+        ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
             path: _path,
             recipient: address(this),
             deadline: block.timestamp,
             amountIn: _amountIn,
             amountOutMinimum: 0
         });
-        return IUniswapRouterV3(_router).exactInput(params);
+        return ISwapRouter(_router).exactInput(params);
     }
 
     // Swap along a token route using known fees and amountIn
@@ -35,17 +35,17 @@ library UniswapV3Utils {
     }
 
     // Convert encoded path to token route
-    function pathToRoute(bytes memory _path) internal pure returns (address[] memory) {
-        uint256 numPools = _path.numPools();
-        address[] memory route = new address[](numPools + 1);
-        for (uint256 i; i < numPools; i++) {
-            (address tokenA, address tokenB,) = _path.decodeFirstPool();
-            route[i] = tokenA;
-            route[i + 1] = tokenB;
-            _path = _path.skipToken();
-        }
-        return route;
-    }
+    // function pathToRoute(bytes memory _path) internal pure returns (address[] memory) {
+    //     uint256 numPools = _path.numPools();
+    //     address[] memory route = new address[](numPools + 1);
+    //     for (uint256 i; i < numPools; i++) {
+    //         (address tokenA, address tokenB,) = _path.decodeFirstPool();
+    //         route[i] = tokenA;
+    //         route[i + 1] = tokenB;
+    //         _path = _path.skipToken();
+    //     }
+    //     return route;
+    // }
 
     // Convert token route to encoded path
     // uint24 type for fees so path is packed tightly

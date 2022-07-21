@@ -33,10 +33,15 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
 
     /**
      * @dev Tokens Used:
-     * {WFTM} - Required for liquidity routing when doing swaps.
-     * {want} - Address of the token being lent
+     * {USDC} - Token for charging fees
      */
-    address public constant WFTM = address(0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83);
+    address public constant USDC = address(0x7F5c764cBc14f9669B88837ca1490cCa17c31607);
+
+    /**
+     * @dev UniV3 routes:
+     * {wantToUsdcRoute} - Route for charging fees from profit
+     */
+    bytes public wantToUsdcRoute;
 
     /**
      * @dev Tarot variables
@@ -59,6 +64,7 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
     bool public shouldHarvestOnDeposit;
     bool public shouldHarvestOnWithdraw;
     uint256 public constant MAX_SLIPPAGE_TOLERANCE = 100;
+    uint256 public minWantToSell;
 
     /**
      * @dev Initializes the strategy. Sets parameters, saves routes, and gives allowances.
@@ -69,19 +75,22 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         address[] memory _feeRemitters,
         address[] memory _strategists,
         address[] memory _multisigRoles,
-        uint256 _initialPoolIndex,
-        address _want
+        address[] memory _wantToUsdcRoute,
+        uint24[] memory _wantToDaiFee,
+        uint256 _initialPoolIndex
     ) public initializer {
-        __ReaperBaseStrategy_init(_vault, _want, _feeRemitters, _strategists, _multisigRoles);
-       sharePriceSnapshot = IVault(_vault).getPricePerFullShare();
+        __ReaperBaseStrategy_init(_vault, _wantToUsdcRoute[0], _feeRemitters, _strategists, _multisigRoles);
+        sharePriceSnapshot = IVault(_vault).getPricePerFullShare();
         maxPools = 40;
-        minProfitToChargeFees = 1e16;
+        minProfitToChargeFees = 1e9;
         minWantToDepositOrWithdraw = 10;
         maxWantRemainingToRemovePool = 100;
+        minWantToSell = 12 * 1e8;
         addUsedPool(_initialPoolIndex);
         depositPool = usedPools.at(0); // Guarantees depositPool is always a Tarot pool
         shouldHarvestOnDeposit = true;
         shouldHarvestOnWithdraw = true;
+        wantToUsdcRoute = UniswapV3Utils.routeToPath(_wantToUsdcRoute, _wantToDaiFee);
     }
 
     function _adjustPosition(uint256 _debt) internal override {
@@ -245,7 +254,6 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
         uint256 profit = profitSinceHarvest();
         if (profit >= minProfitToChargeFees) {
             uint256 fee = (profit * totalFee) / PERCENT_DIVISOR;
-            IERC20Upgradeable wftm = IERC20Upgradeable(WFTM);
 
             if (fee != 0) {
                 uint256 wantBal = IERC20Upgradeable(want).balanceOf(address(this));
@@ -255,44 +263,33 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
                         fee = withdrawn + wantBal;
                     }
                 }
-                _swap(want, WFTM, fee);
-                uint256 wftmBalance = IERC20Upgradeable(WFTM).balanceOf(address(this));
-                callerFee = (wftmBalance * callFee) / PERCENT_DIVISOR;
-                uint256 treasuryFeeToVault = (wftmBalance * treasuryFee) / PERCENT_DIVISOR;
+                _swapToUsdc(fee);
+                IERC20Upgradeable usdc = IERC20Upgradeable(USDC);
+                uint256 usdcBalance = usdc.balanceOf(address(this));
+                callerFee = (usdcBalance * callFee) / PERCENT_DIVISOR;
+                uint256 treasuryFeeToVault = (usdcBalance * treasuryFee) / PERCENT_DIVISOR;
                 uint256 feeToStrategist = (treasuryFeeToVault * strategistFee) / PERCENT_DIVISOR;
                 treasuryFeeToVault -= feeToStrategist;
 
-                wftm.safeTransfer(msg.sender, callerFee);
-                wftm.safeTransfer(treasury, treasuryFeeToVault);
-                wftm.safeTransfer(strategistRemitter, feeToStrategist);
+                
+                usdc.safeTransfer(msg.sender, callerFee);
+                usdc.safeTransfer(treasury, treasuryFeeToVault);
+                usdc.safeTransfer(strategistRemitter, feeToStrategist);
                 sharePriceSnapshot = IVault(vault).getPricePerFullShare();
             }
         }
     }
 
     /**
-     * @dev Helper function to swap tokens given {_from}, {_to} and {_amount}
+     * @dev Helper function to swap want to USDC
      */
-    function _swap(
-        address _from,
-        address _to,
+    function _swapToUsdc(
         uint256 _amount
     ) internal {
-        if (_from == _to || _amount == 0) {
-            return;
+        if (_amount >= minWantToSell) {
+            IERC20Upgradeable(want).safeIncreaseAllowance(UNI_ROUTER, _amount);
+            UniswapV3Utils.swap(UNI_ROUTER, wantToUsdcRoute, _amount);
         }
-
-        address[] memory path = new address[](2);
-        path[0] = _from;
-        path[1] = _to;
-        IERC20Upgradeable(_from).safeIncreaseAllowance(UNI_ROUTER, _amount);
-        IUniswapV2Router02(UNI_ROUTER).swapExactTokensForTokensSupportingFeeOnTransferTokens(
-            _amount,
-            0,
-            path,
-            address(this),
-            block.timestamp
-        );
     }
 
     /**
@@ -554,5 +551,13 @@ contract ReaperStrategyTarot is ReaperBaseStrategyv4 {
     function setShouldHarvestOnWithdraw(bool _shouldHarvestOnWithdraw) external {
         _atLeastRole(STRATEGIST);
         shouldHarvestOnWithdraw = _shouldHarvestOnWithdraw;
+    }
+
+    /**
+     * @dev Sets the minimum want that will be sold (too little causes revert from Uniswap)
+     */
+    function setMinWantToSell(uint256 _minWantToSell) external {
+        _atLeastRole(STRATEGIST);
+        minWantToSell = _minWantToSell;
     }
 }
